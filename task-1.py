@@ -5,6 +5,10 @@ import time
 HOST = "0.0.0.0"
 PORT = 9001
 
+# Dictionary to store key-value, preventing race conditions issu
+kv_store = {}
+store_lock = threading.Lock()
+
 # Function to handle each client communication
 def handle_client(client_socket, client_address):
     print(f"Sto gestendo il client: {client_address} in un thread separato")
@@ -49,7 +53,23 @@ def handle_client(client_socket, client_address):
                     # We take everything after first space
                     txt = line.split(' ',1)[1]
                     response = txt
-                        
+                 
+            elif command == "SET":
+                if len(tokens) == 3: # With a correct input this command has exactly 3 parts: SET <key> <value>
+                    with store_lock:
+                        kv_store[tokens[1]] = tokens[2]
+                        response = "OK"
+                else:
+                    response = "ERR"  
+            
+            elif command == "GET":
+                if len(tokens) >= 2: # Error handling on lacking parts input
+                      with store_lock:
+                          response = kv_store.get(tokens[1], "NOT_FOUND")
+                else:
+                    response = "ERR"
+                    
+                       
             # Wrong command
             else:
                 response = "ERR"        
