@@ -5,15 +5,63 @@ import time
 HOST = "0.0.0.0"
 PORT = 9001
 
-
 # Function to handle each client communication
 def handle_client(client_socket, client_address):
     print(f"Sto gestendo il client: {client_address} in un thread separato")
     
-    time.sleep(10)
+    # Create buffer to receive multiple commands in the same connection
+    buffer=""
+    
+    # Continous loop to keep receiving data
+    while(True):
+        data = client_socket.recv(4096)
+        if not data:
+            break
+        
+        # Convert to ascii and append new data to buffer
+        buffer += data.decode('ascii')
+        
+        # 2. Process ALL complete commands currently stored in the buffer
+        while '\n' in buffer:
+            # Extract one line, and keep the remainder in buffer
+            line, buffer = buffer.split('\n', 1)
+            
+            # Skip empty lines (e.g., if the user just pressed Enter)
+            if not line:
+                continue
+            
+            # 'line' is your actual command string (e.g., "PING" or "ECHO hello")
+            print(f"Received command: {line}")
+            
+            # Dividing the row in max 3 parts
+            tokens = line.split(' ', 2)
+            command = tokens[0] # This is the principal commmand
+            
+            response = ""
+            
+            if command == "PING":
+                response = "PONG"
+            elif command == "ECHO":
+                
+                # Verifing if some txt is entered after the ECHO command
+                if len(tokens) > 1:
+                    
+                    # We take everything after first space
+                    txt = line.split(' ',1)[1]
+                    response = txt
+                        
+            # Wrong command
+            else:
+                response = "ERR"        
+                
+            
+            # Temporary test response:
+            client_socket.sendall(f"{response}\n".encode('ascii'))
+
     
     # Close connection when communication is finished
     client_socket.close()
+    print(f"Connection closed for client: {client_address}.")
     
     
 def main():
