@@ -6,7 +6,7 @@ import time
 HOST = "0.0.0.0"
 PORT = 9001
 
-# Dictionary to store key-value, preventing race conditions issu
+# Dictionary to store key-value, preventing race conditions issues
 kv_store = {}
 store_lock = threading.Lock()
 
