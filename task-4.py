@@ -11,8 +11,9 @@ PORT1 = 4433
 configuration = QuicConfiguration(
     is_client=False,
     # Standard ports for certs we just made
-    certificate_path='server.crt',
-    private_key_path='server.key',
+    cafile='ca.crt',
+    certificate='server.crt',
+    private_key='server.key',
 )
 
 class Http3Handler(QuicConnectionProtocol):
