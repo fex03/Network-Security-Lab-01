@@ -57,3 +57,19 @@ class Http3Handler(QuicConnectionProtocol):
         self.transmit()
         
         
+async def main():
+    print('[*] Starting HTTP/3 Server on udp://localhost:4433')
+    await serve(
+        '127.0.0.1',
+        PORT1,
+        configuration=configuration,
+        create_protocol=Http3Handler,
+    )
+    # This keeps the server running forever
+    await asyncio.Future()
+ 
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
