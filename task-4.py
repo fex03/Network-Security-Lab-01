@@ -3,6 +3,7 @@ import hashlib
 from quart import Quart, request, make_response
 from hypercorn.config import Config
 from hypercorn.asyncio import serve
+from hashlib import sha256
 
 app = Quart(__name__)
 
@@ -31,6 +32,14 @@ async def get():
 async def get_proto():
     version = request.http_version
     response = await make_response(f"HTTP/{version}", 200)
+    return response
+
+@app.route('/hash', methods=['POST'])
+async def post_hash():
+    body = await request.get_data()
+    hashed_body = sha256(body)
+    hex_body = hashed_body.hexdigest()
+    response = await make_response(f"{hex_body}", 200)
     return response
 
 if __name__ == "__main__":
