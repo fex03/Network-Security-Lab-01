@@ -20,11 +20,17 @@ async def main():
     await serve(app, config)
     
 @app.route('/', methods=['GET'])
-async def hello_world():
+async def get():
     version = request.http_version
     response = await make_response("Ok", 200)
     if version != "3":
         response.headers["Alt-Svc"] = 'h3=":4433"'
+    return response
+
+@app.route('/proto', methods=['GET'])
+async def get_proto():
+    version = request.http_version
+    response = await make_response(f"HTTP/{version}", 200)
     return response
 
 if __name__ == "__main__":
